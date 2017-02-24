@@ -20,25 +20,26 @@ class AjaxLinkKotlinTest : WicketTestCase() {
 
     @Test
     fun ajaxLinkTest() {
-        val counter = AtomicInteger(0)
-        val lambda = { target: AjaxRequestTarget ->
-            counter.incrementAndGet()
+        doTest { counter ->
+            tester.startPage(AjaxLinkTestPage { target: AjaxRequestTarget ->
+                counter.incrementAndGet()
+            })
         }
-        tester.startPage(AjaxLinkTestPage(lambda))
-
-        assertThat(counter.get(), Is(0))
-
-        tester.clickLink("link", true)
-        assertThat(counter.get(), Is(1))
     }
 
     @Test
     fun ajaxLinkWithSelfTest() {
+        doTest { counter ->
+            tester.startPage(AjaxLinkSelfTestPage({ target: AjaxRequestTarget ->
+                counter.incrementAndGet()
+                assertThat(this, Is(instanceOf(AjaxLink::class.java)))
+            }))
+        }
+    }
+
+    private fun doTest(startPage: (counter: AtomicInteger) -> Unit) {
         val counter = AtomicInteger(0)
-        tester.startPage(AjaxLinkSelfTestPage({ target: AjaxRequestTarget ->
-            counter.incrementAndGet()
-            assertThat(this, Is(instanceOf(AjaxLink::class.java)))
-        }))
+        startPage(counter)
 
         assertThat(counter.get(), Is(0))
 
@@ -46,25 +47,21 @@ class AjaxLinkKotlinTest : WicketTestCase() {
         assertThat(counter.get(), Is(1))
     }
 
-    private class AjaxLinkTestPage(lambda: (target: AjaxRequestTarget) -> Any) : WebPage(), IMarkupResourceStreamProvider {
-
-        init {
-            add(ajaxLink<Any>("link", lambda))
-        }
-
+    private interface MarkupResourceStreamProvider : IMarkupResourceStreamProvider {
         override fun getMarkupResourceStream(container: MarkupContainer, containerClass: Class<*>): IResourceStream {
             return StringResourceStream("<html><body><a wicket:id='link'></a></body></html>")
         }
     }
 
-    private class AjaxLinkSelfTestPage(lambda: AjaxLink<*>.(target: AjaxRequestTarget) -> Any) : WebPage(), IMarkupResourceStreamProvider {
-
+    private class AjaxLinkTestPage(lambda: (target: AjaxRequestTarget) -> Any) : WebPage(), MarkupResourceStreamProvider {
         init {
             add(ajaxLink<Any>("link", lambda))
         }
+    }
 
-        override fun getMarkupResourceStream(container: MarkupContainer, containerClass: Class<*>): IResourceStream {
-            return StringResourceStream("<html><body><a wicket:id='link'></a></body></html>")
+    private class AjaxLinkSelfTestPage(lambda: AjaxLink<*>.(target: AjaxRequestTarget) -> Any) : WebPage(), MarkupResourceStreamProvider {
+        init {
+            add(ajaxLink<Any>("link", lambda))
         }
     }
 }

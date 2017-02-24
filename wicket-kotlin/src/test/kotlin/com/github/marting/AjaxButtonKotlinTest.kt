@@ -21,26 +21,28 @@ class AjaxButtonKotlinTest : WicketTestCase() {
 
     @Test
     fun ajaxButtonTest() {
-        val counter = AtomicInteger(0)
-        val lambda = { target: AjaxRequestTarget ->
-            counter.incrementAndGet()
+        doTest { counter ->
+            val lambda = { target: AjaxRequestTarget ->
+                counter.incrementAndGet()
+            }
+            tester.startPage(AjaxButtonTestPage(lambda))
         }
-        tester.startPage(AjaxButtonTestPage(lambda))
-
-        assertThat(counter.get(), Is(0))
-
-        val formTester = tester.newFormTester("form")
-        formTester.submit("button")
-        assertThat(counter.get(), Is(1))
     }
 
     @Test
     fun ajaxButtonWithSelfTest() {
+        doTest { counter ->
+            tester.startPage(AjaxButtonSelfTestPage({ target: AjaxRequestTarget ->
+                counter.incrementAndGet()
+                assertThat(this, Is(instanceOf(AjaxButton::class.java)))
+            }))
+        }
+    }
+
+    private fun doTest(startPage: (counter: AtomicInteger) -> Unit) {
         val counter = AtomicInteger(0)
-        tester.startPage(AjaxButtonSelfTestPage({ target: AjaxRequestTarget ->
-            counter.incrementAndGet()
-            assertThat(this, Is(instanceOf(AjaxButton::class.java)))
-        }))
+
+        startPage(counter)
 
         assertThat(counter.get(), Is(0))
 
