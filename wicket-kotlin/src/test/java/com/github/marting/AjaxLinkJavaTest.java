@@ -20,7 +20,7 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 
 /**
- * Unit tests for {@link WicketKt#ajaxLink(String, Function1)}.
+ * Java tests for {@link WicketKt#ajaxLink(String, Function1)}.
  */
 public class AjaxLinkJavaTest extends WicketTestCase
 {
