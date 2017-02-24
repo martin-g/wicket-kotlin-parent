@@ -7,11 +7,9 @@
     <artifactId>wicket-kotlin-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>com.github.martin-g</groupId>
   <artifactId>wicket-kotlin</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <name>wicket-kotlin</name>
-  <url>http://maven.apache.org</url>
+  <name>Wicket Kotlin</name>
+  
   <dependencies>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
